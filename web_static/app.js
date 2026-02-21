@@ -129,8 +129,8 @@ function renderChart(rezultati, dateRange){
     const ym = minutes[idx];
     const sc = sessions[idx];
     // sessions inside
-    const yPos = sc===0 ? ym+5 : (ym>4? ym*0.5 : ym+2);
-    annotations.push({x:n, y:yPos, text:String(sc), showarrow:false, font:{size:10, color: sc===0? 'black':'white'}});
+    const yPos = ym>4? ym*0.5 : ym+2;
+    annotations.push({x:n, y:yPos, text:String(sc), showarrow:false, font:{size:10, color: 'white'}});
     // minutes outlined above
     const yTop = ym + Math.max(8, Math.round(maxMin*0.02));
     outlineOffsets.forEach(off => {
