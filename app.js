@@ -123,7 +123,7 @@ function renderChart(rezultati, dateRange){
   names.forEach((n, idx)=>{
     const ym = minutes[idx];
     const sc = sessions[idx];
-    const yPos = ym>4? ym*0.5 : ym+2;
+    const yPos = Math.max(ym * 0.5, 10);
     annotations.push({x:n, y:yPos, text:String(sc), showarrow:false, font:{size:10, color: 'white'}});
     const yTop = ym + Math.max(8, Math.round(maxMin*0.02));
     outlineOffsets.forEach(off => {
