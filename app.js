@@ -49,7 +49,9 @@ function parseCsvFile(file){
           }
           return norm;
         });
-        resolve({name: file.name.replace(/\.csv$/i,'').replace(/[^\w\s-]/g,''), rows: data});
+        const cleanName = file.name.replace(/\.csv$/i,'').trim();
+        console.log('Parsed file:', file.name, '→ Name:', cleanName);
+        resolve({name: cleanName, rows: data});
       },
       error: (err) => reject(err)
     });
@@ -92,6 +94,7 @@ function formatDate(d){
 }
 
 function renderChart(rezultati, dateRange){
+  console.log('Aggregated results:', rezultati);
   const items = Object.entries(rezultati).map(([k,v])=>({name:k, minutes:v.minutes, sessions:v.sessions}));
   items.sort((a,b)=>a.minutes-b.minutes);
   const names = items.map(i=>i.name);
