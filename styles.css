@@ -1,0 +1,8 @@
+body{font-family:Segoe UI, Tahoma, Arial, sans-serif;background:#f7f9fb;color:#2d3436;margin:0;padding:20px}
+.container{max-width:1100px;margin:0 auto;background:#fff;padding:20px;border-radius:8px;box-shadow:0 6px 24px rgba(20,20,30,0.06)}
+h1{margin:0 0 8px}
+.controls{margin:10px 0}
+button{margin-right:8px;padding:8px 12px;border-radius:6px;border:1px solid #dfe6e9;background:#2d3436;color:white;cursor:pointer}
+button:disabled{opacity:0.5;cursor:not-allowed}
+.chart{margin-top:18px}
+.message{margin-top:12px;color:#e74c3c}
