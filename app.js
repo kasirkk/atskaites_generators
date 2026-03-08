@@ -50,8 +50,9 @@ function parseCsvFile(file){
           return norm;
         });
         const cleanName = file.name.replace(/\.csv$/i,'').trim();
-        console.log('Parsed file:', file.name, '→ Name:', cleanName);
-        resolve({name: cleanName, rows: data});
+        const displayName = /^\d+$/.test(cleanName) ? `Sportistu_${cleanName}` : cleanName;
+        console.log('Parsed file:', file.name, '→ Display Name:', displayName);
+        resolve({name: displayName, rows: data});
       },
       error: (err) => reject(err)
     });
@@ -65,11 +66,13 @@ function aggregate(filesData){
     const rows = f.rows;
     let zona2 = 0, zona3 = 0, sessions = 0;
     rows.forEach(r => {
-      const wt = (r['WorkoutType'] || r['Workout type'] || '').toString().toLowerCase().trim();
-      if (!unwanted.includes(wt)) sessions += 1;
-      const z2 = parseFloat(r['HRZone2Minutes'] || r['HR Zone 2 Minutes'] || r['HRZone2'] || 0) || 0;
-      const z3 = parseFloat(r['HRZone3Minutes'] || r['HR Zone 3 Minutes'] || r['HRZone3'] || 0) || 0;
-      zona2 += z2; zona3 += z3;
+      const wt = (r['Title'] || r['title'] || r['WorkoutType'] || r['Workout type'] || '').toString().toLowerCase().trim();
+      if (['strength','other','strength training','training'].includes(wt)) sessions += 1;
+      if (!['strength','other','strength training','training'].includes(wt)) {
+        const z2 = parseFloat(r['HRZone2Minutes'] || r['HR Zone 2 Minutes'] || r['HRZone2'] || 0) || 0;
+        const z3 = parseFloat(r['HRZone3Minutes'] || r['HR Zone 3 Minutes'] || r['HRZone3'] || 0) || 0;
+        zona2 += z2; zona3 += z3;
+      }
       const wd = r['WorkoutDay'] || r['Workout Day'] || r['Date'] || r['date'];
       if (wd) {
         const dt = new Date(wd);
@@ -116,11 +119,6 @@ function renderChart(rezultati, dateRange){
   const maxY = Math.max(350, Math.max(...minutes)+50);
 
   const annotations = [];
-  const y_positions = [maxY*0.03, maxY*0.2, maxY*0.45, maxY*0.7, maxY*0.95];
-  limenu_nosaukumi.forEach((n,i)=>{
-    annotations.push({xref:'paper', yref:'y', x:-0.02, y:y_positions[i], text:n, showarrow:false, font:{size:14,color:'#2d3436'}, align:'right', xanchor:'right'});
-  });
-
   const outlineOffsets = [[-1,0],[1,0],[0,-1],[0,1],[-1,-1],[-1,1],[1,-1],[1,1]];
   const maxMin = Math.max(...minutes,0);
   names.forEach((n, idx)=>{
@@ -142,12 +140,13 @@ function renderChart(rezultati, dateRange){
   }
 
   const layout = {
-    title: {text:title, x:0.02},
+    title: {text:title, x:0.5},
     shapes: shapes,
     annotations: annotations,
     height:600,
     margin:{l:180, r:40, t:90, b:140},
     yaxis:{range:[0,maxY], gridcolor:'rgba(0,0,0,0.06)'},
+    xaxis:{tickangle: 45},
     plot_bgcolor:'white',
     bargap:0.15
   };
@@ -159,7 +158,7 @@ function renderChart(rezultati, dateRange){
 
 downloadHtmlBtn.addEventListener('click', ()=>{
   if (!lastFig) return;
-  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Active For Life — Kopsavilkums</title><script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script></head><body>${chartDiv.innerHTML}<script>var fig = ${JSON.stringify(lastFig)};Plotly.newPlot(document.querySelector('#' + Object.keys(document.querySelectorAll('div')[0].id || {}).join()), fig.data, fig.layout);</script></body></html>`;
+  const html = `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Active For Life — Kopsavilkums</title><script src="https://cdn.plot.ly/plotly-2.24.2.min.js"></script></head><body><div id="chart"></div><script>var fig = ${JSON.stringify(lastFig)};Plotly.newPlot(document.querySelector('#chart'), fig.data, fig.layout);</script></body></html>`;
   const blob = new Blob([html], {type:'text/html'});
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
